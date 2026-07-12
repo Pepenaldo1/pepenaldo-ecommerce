@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
 
 export default function BecomeVendor() {
-  const { user, token, loading: authLoading } = useAuth();
+  const { user, token, loading: authLoading, updateSession } = useAuth();
   const router = useRouter();
   const [businessName, setBusinessName] = useState('');
   const [bio, setBio] = useState('');
@@ -38,8 +38,7 @@ export default function BecomeVendor() {
       // Registering as a vendor re-issues the JWT with role=vendor.
       // We store it manually here so the change takes effect right away.
       const data = await api.post('/vendor/register', { business_name: businessName, vendor_bio: bio }, token);
-      localStorage.setItem('pepenaldo_token', data.token);
-      localStorage.setItem('pepenaldo_user', JSON.stringify(data.user));
+      updateSession(data.user, data.token);
       router.push('/vendor/dashboard');
     } catch (err) {
       setError(err.message);
