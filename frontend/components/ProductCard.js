@@ -59,6 +59,10 @@ export default function ProductCard({ product }) {
         <p className="font-mono text-[10px] text-gray-500 tracking-wide mt-1">
           {product.stock > 0 ? `${product.stock} IN STOCK` : 'OUT OF STOCK'}
         </p>
+        <p className="font-mono text-[10px] text-gray-600 tracking-wide mt-0.5">
+          Sold by {product.vendor_name || 'Pepenaldo'}
+          {product.vendor_verified && <span className="text-cyan"> ✓</span>}
+        </p>
       </div>
 
       <div className="mt-auto pt-3 border-t border-line flex items-center justify-between">

@@ -9,6 +9,7 @@ const productRoutes = require('./routes/productRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const vendorRoutes = require('./routes/vendorRoutes');
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/vendor', vendorRoutes);
 
 // 404 handler
 app.use((req, res) => res.status(404).json({ error: 'Route not found.' }));

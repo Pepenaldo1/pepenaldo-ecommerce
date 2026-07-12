@@ -25,4 +25,12 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-module.exports = { requireAuth, requireAdmin };
+// Must be used AFTER requireAuth. Blocks anyone who isn't a vendor or admin.
+function requireVendor(req, res, next) {
+  if (req.user?.role !== 'vendor' && req.user?.role !== 'admin') {
+    return res.status(403).json({ error: 'Vendor access required.' });
+  }
+  next();
+}
+
+module.exports = { requireAuth, requireAdmin, requireVendor };
