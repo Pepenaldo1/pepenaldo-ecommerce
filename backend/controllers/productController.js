@@ -18,9 +18,11 @@ async function listProducts(req, res) {
 
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const result = await db.query(
-      `SELECT p.*, c.name AS category_name, c.slug AS category_slug
+      `SELECT p.*, c.name AS category_name, c.slug AS category_slug,
+              v.business_name AS vendor_name, v.vendor_verified
        FROM products p
        LEFT JOIN categories c ON c.id = p.category_id
+       LEFT JOIN users v ON v.id = p.vendor_id
        ${where}
        ORDER BY p.created_at DESC`,
       params
@@ -36,9 +38,11 @@ async function listProducts(req, res) {
 async function getProduct(req, res) {
   try {
     const result = await db.query(
-      `SELECT p.*, c.name AS category_name, c.slug AS category_slug
+      `SELECT p.*, c.name AS category_name, c.slug AS category_slug,
+              v.business_name AS vendor_name, v.vendor_verified, v.id AS vendor_id_ref
        FROM products p
        LEFT JOIN categories c ON c.id = p.category_id
+       LEFT JOIN users v ON v.id = p.vendor_id
        WHERE p.id = $1`,
       [req.params.id]
     );
@@ -117,4 +121,36 @@ async function listCategories(req, res) {
   }
 }
 
-module.exports = { listProducts, getProduct, createProduct, updateProduct, deleteProduct, listCategories };
+// POST /api/admin/categories  (admin only)
+function slugify(name) {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+async function createCategory(req, res) {
+  try {
+    const { name } = req.body;
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Category name is required.' });
+    }
+    const slug = slugify(name);
+    const result = await db.query(
+      `INSERT INTO categories (name, slug) VALUES ($1, $2)
+       ON CONFLICT (name) DO NOTHING
+       RETURNING id, name, slug`,
+      [name.trim(), slug]
+    );
+    if (result.rows.length === 0) {
+      return res.status(409).json({ error: 'A category with this name already exists.' });
+    }
+    res.status(201).json({ category: result.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Could not create category.' });
+  }
+}
+
+module.exports = { listProducts, getProduct, createProduct, updateProduct, deleteProduct, listCategories, createCategory };

@@ -18,6 +18,8 @@ export default function AdminProducts() {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [categoryError, setCategoryError] = useState('');
 
   async function loadProducts() {
     const data = await api.get('/products');
@@ -88,11 +90,40 @@ export default function AdminProducts() {
     await loadProducts();
   }
 
+  async function handleAddCategory(e) {
+    e.preventDefault();
+    setCategoryError('');
+    try {
+      await api.post('/admin/categories', { name: newCategoryName }, token);
+      setNewCategoryName('');
+      await loadCategories();
+    } catch (err) {
+      setCategoryError(err.message);
+    }
+  }
+
   if (loading) return <div className="max-w-5xl mx-auto px-6 py-16 text-gray-500">Loading…</div>;
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-16">
       <h1 className="font-display font-bold text-3xl mb-8">Manage products</h1>
+
+      <form onSubmit={handleAddCategory} className="bg-surface border border-line rounded-xl p-6 mb-6 flex gap-3 items-start flex-wrap">
+        <input
+          required
+          placeholder="New category name (e.g. Ebooks, Movies)"
+          value={newCategoryName}
+          onChange={(e) => setNewCategoryName(e.target.value)}
+          className="bg-bg border border-line rounded-md px-4 py-2.5 flex-1 min-w-[200px] focus:outline-none focus:border-cyan"
+        />
+        <button type="submit" className="border border-cyan text-cyan font-display font-semibold uppercase tracking-wide px-5 py-2.5 rounded-md">
+          Add category
+        </button>
+        {categoryError && <p className="text-magenta text-sm font-mono w-full">{categoryError}</p>}
+        <p className="text-gray-500 text-xs font-mono w-full">
+          Current categories: {categories.map((c) => c.name).join(', ') || 'none yet'}
+        </p>
+      </form>
 
       <form onSubmit={handleSubmit} className="bg-surface border border-line rounded-xl p-6 mb-10 grid md:grid-cols-2 gap-4">
         <input

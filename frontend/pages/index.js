@@ -3,19 +3,17 @@ import { useRouter } from 'next/router';
 import { api } from '../lib/api';
 import ProductCard from '../components/ProductCard';
 
-const categories = [
-  { slug: null, label: 'All' },
-  { slug: 'tech', label: 'Tech' },
-  { slug: 'food', label: 'Food' },
-  { slug: 'fashion', label: 'Fashion' },
-];
-
 export default function Home() {
   const router = useRouter();
   const { category } = router.query;
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/products/meta/categories').then((data) => setCategories(data.categories));
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -43,17 +41,23 @@ export default function Home() {
       </section>
 
       <div className="flex flex-wrap items-center gap-3 mb-8">
+        <button
+          onClick={() => router.push('/')}
+          className={`px-4 py-2 rounded-md text-sm font-display font-semibold uppercase tracking-wide border transition ${
+            !category ? 'bg-cyan text-bg border-cyan' : 'border-line text-gray-400 hover:text-white'
+          }`}
+        >
+          All
+        </button>
         {categories.map((c) => (
           <button
-            key={c.slug || 'all'}
-            onClick={() => router.push(c.slug ? `/?category=${c.slug}` : '/')}
+            key={c.id}
+            onClick={() => router.push(`/?category=${c.slug}`)}
             className={`px-4 py-2 rounded-md text-sm font-display font-semibold uppercase tracking-wide border transition ${
-              category === c.slug || (!category && !c.slug)
-                ? 'bg-cyan text-bg border-cyan'
-                : 'border-line text-gray-400 hover:text-white'
+              category === c.slug ? 'bg-cyan text-bg border-cyan' : 'border-line text-gray-400 hover:text-white'
             }`}
           >
-            {c.label}
+            {c.name}
           </button>
         ))}
         <input
