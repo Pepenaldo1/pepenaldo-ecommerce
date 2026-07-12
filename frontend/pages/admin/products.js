@@ -13,6 +13,7 @@ export default function AdminProducts() {
   const { user, token, loading: authLoading } = useAuth();
   const router = useRouter();
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,13 +24,18 @@ export default function AdminProducts() {
     setProducts(data.products);
   }
 
+  async function loadCategories() {
+    const data = await api.get('/products/meta/categories');
+    setCategories(data.categories);
+  }
+
   useEffect(() => {
     if (authLoading) return;
     if (!user || user.role !== 'admin') {
       router.push('/login');
       return;
     }
-    loadProducts().finally(() => setLoading(false));
+    Promise.all([loadProducts(), loadCategories()]).finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, router]);
 
@@ -118,6 +124,17 @@ export default function AdminProducts() {
           onChange={(e) => update('image_url', e.target.value)}
           className="bg-bg border border-line rounded-md px-4 py-2.5 focus:outline-none focus:border-cyan"
         />
+        <select
+          required
+          value={form.category_id}
+          onChange={(e) => update('category_id', e.target.value)}
+          className="bg-bg border border-line rounded-md px-4 py-2.5 focus:outline-none focus:border-cyan"
+        >
+          <option value="">Select a category…</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
+        </select>
         <textarea
           placeholder="Description"
           value={form.description}

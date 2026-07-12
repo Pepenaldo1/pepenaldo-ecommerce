@@ -106,4 +106,15 @@ async function deleteProduct(req, res) {
   }
 }
 
-module.exports = { listProducts, getProduct, createProduct, updateProduct, deleteProduct };
+// GET /api/products/meta/categories
+async function listCategories(req, res) {
+  try {
+    const result = await db.query('SELECT id, name, slug FROM categories ORDER BY name');
+    res.json({ categories: result.rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Could not load categories.' });
+  }
+}
+
+module.exports = { listProducts, getProduct, createProduct, updateProduct, deleteProduct, listCategories };

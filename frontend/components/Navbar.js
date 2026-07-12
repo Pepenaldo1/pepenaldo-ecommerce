@@ -32,6 +32,9 @@ export default function Navbar() {
               <Link href="/orders" className="text-gray-400 hover:text-white transition hidden sm:inline">
                 Orders
               </Link>
+              <Link href="/account" className="text-gray-400 hover:text-white transition">
+                {user.name.split(' ')[0]}
+              </Link>
               <button onClick={logout} className="text-gray-400 hover:text-white transition">
                 Logout
               </button>
