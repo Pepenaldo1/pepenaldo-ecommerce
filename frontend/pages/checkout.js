@@ -91,7 +91,7 @@ export default function Checkout() {
         <button
           type="submit"
           disabled={loading || items.length === 0}
-          className="mt-2 bg-cyan text-bg font-display font-semibold uppercase tracking-wide py-3 rounded-md hover:shadow-[0_0_24px_#00E5FF55] transition disabled:opacity-40"
+          className="mt-2 bg-cyan text-bg font-display font-semibold uppercase tracking-wide py-3 rounded-md hover:shadow-[0_0_24px_#A855F755] transition disabled:opacity-40"
         >
           {loading ? 'Redirecting to Paystack…' : 'Pay with Paystack'}
         </button>

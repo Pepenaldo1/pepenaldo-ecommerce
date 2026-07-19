@@ -1,29 +1,10 @@
 import Link from 'next/link';
-import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const { count } = useCart();
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  const navLinks = (
-    <>
-      <Link href="/?category=tech" className="hover:text-white transition" onClick={() => setMenuOpen(false)}>Tech</Link>
-      <Link href="/?category=food" className="hover:text-white transition" onClick={() => setMenuOpen(false)}>Food</Link>
-      <Link href="/?category=fashion" className="hover:text-white transition" onClick={() => setMenuOpen(false)}>Fashion</Link>
-      {user?.role === 'admin' && (
-        <Link href="/admin" className="hover:text-cyan transition" onClick={() => setMenuOpen(false)}>Admin</Link>
-      )}
-      {user?.role === 'vendor' && (
-        <Link href="/vendor/dashboard" className="hover:text-cyan transition" onClick={() => setMenuOpen(false)}>My store</Link>
-      )}
-      {(!user || user.role === 'customer') && (
-        <Link href="/become-vendor" className="hover:text-cyan transition" onClick={() => setMenuOpen(false)}>Sell on Pepenaldo</Link>
-      )}
-    </>
-  );
 
   return (
     <header className="sticky top-0 z-50 bg-bg/85 backdrop-blur border-b border-line">
@@ -34,7 +15,12 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden md:flex gap-8 text-sm uppercase tracking-wide text-gray-400">
-          {navLinks}
+          <Link href="/?category=tech" className="hover:text-white transition">Tech</Link>
+          <Link href="/?category=food" className="hover:text-white transition">Food</Link>
+          <Link href="/?category=fashion" className="hover:text-white transition">Fashion</Link>
+          {user?.role === 'admin' && (
+            <Link href="/admin" className="hover:text-cyan transition">Admin</Link>
+          )}
         </div>
 
         <div className="flex items-center gap-4 font-mono text-sm">
@@ -58,21 +44,8 @@ export default function Navbar() {
               Login
             </Link>
           )}
-          <button
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-label="Menu"
-            className="md:hidden border border-line rounded-md px-2.5 py-1.5 hover:border-cyan transition"
-          >
-            {menuOpen ? '✕' : '☰'}
-          </button>
         </div>
       </nav>
-
-      {menuOpen && (
-        <div className="md:hidden flex flex-col gap-4 px-6 pb-5 text-sm uppercase tracking-wide text-gray-400 border-t border-line pt-4">
-          {navLinks}
-        </div>
-      )}
     </header>
   );
 }

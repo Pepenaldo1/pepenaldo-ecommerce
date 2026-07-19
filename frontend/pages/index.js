@@ -30,12 +30,15 @@ export default function Home() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
-      <section className="mb-10">
-        <p className="font-mono text-cyan text-sm mb-3">// ALL SYSTEMS OPERATIONAL</p>
-        <h1 className="font-display font-bold text-4xl md:text-6xl leading-none max-w-2xl">
+      <section
+        className="mb-10 rounded-2xl p-8 md:p-12"
+        style={{ background: 'linear-gradient(135deg, #2E1065 0%, #4C1D95 45%, #6D28D9 100%)' }}
+      >
+        <p className="font-mono text-purple-200 text-sm mb-3">// ALL SYSTEMS OPERATIONAL</p>
+        <h1 className="font-display font-bold text-4xl md:text-6xl leading-none max-w-2xl text-white">
           Tech, food & fashion — one cart.
         </h1>
-        <p className="text-gray-400 mt-4 max-w-lg">
+        <p className="text-purple-100/80 mt-4 max-w-lg">
           Browse the full Pepenaldo catalog. Filter by world, search by name, checkout in seconds.
         </p>
       </section>

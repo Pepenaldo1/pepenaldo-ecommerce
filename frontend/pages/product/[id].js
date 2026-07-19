@@ -76,7 +76,7 @@ export default function ProductDetail() {
           <button
             onClick={handleAdd}
             disabled={product.stock === 0}
-            className="flex-1 bg-cyan text-bg font-display font-semibold uppercase tracking-wide py-3 rounded-md hover:shadow-[0_0_24px_#00E5FF55] transition disabled:opacity-40"
+            className="flex-1 bg-cyan text-bg font-display font-semibold uppercase tracking-wide py-3 rounded-md hover:shadow-[0_0_24px_#A855F755] transition disabled:opacity-40"
           >
             {status === 'added' ? 'Added to cart' : product.stock === 0 ? 'Sold out' : 'Add to cart'}
           </button>

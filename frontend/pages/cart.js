@@ -63,7 +63,7 @@ export default function Cart() {
 
           <Link
             href="/checkout"
-            className="block text-center mt-6 bg-cyan text-bg font-display font-semibold uppercase tracking-wide py-3 rounded-md hover:shadow-[0_0_24px_#00E5FF55] transition"
+            className="block text-center mt-6 bg-cyan text-bg font-display font-semibold uppercase tracking-wide py-3 rounded-md hover:shadow-[0_0_24px_#A855F755] transition"
           >
             Proceed to checkout
           </Link>
