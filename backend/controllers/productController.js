@@ -3,7 +3,7 @@ const db = require('../config/db');
 // GET /api/products?category=tech&search=phone
 async function listProducts(req, res) {
   try {
-    const { category, search } = req.query;
+    const { category, search, featured } = req.query;
     const conditions = ['p.is_active = true'];
     const params = [];
 
@@ -14,6 +14,9 @@ async function listProducts(req, res) {
     if (search) {
       params.push(`%${search}%`);
       conditions.push(`p.name ILIKE $${params.length}`);
+    }
+    if (featured === 'true') {
+      conditions.push(`(p.featured = true OR p.compare_at_price > p.price)`);
     }
 
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -57,14 +60,14 @@ async function getProduct(req, res) {
 // POST /api/admin/products  (admin only)
 async function createProduct(req, res) {
   try {
-    const { name, description, price, stock, image_url, category_id } = req.body;
+    const { name, description, price, stock, image_url, category_id, compare_at_price, featured } = req.body;
     if (!name || price === undefined) {
       return res.status(400).json({ error: 'Name and price are required.' });
     }
     const result = await db.query(
-      `INSERT INTO products (name, description, price, stock, image_url, category_id)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [name, description || null, price, stock || 0, image_url || null, category_id || null]
+      `INSERT INTO products (name, description, price, stock, image_url, category_id, compare_at_price, featured)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      [name, description || null, price, stock || 0, image_url || null, category_id || null, compare_at_price || null, !!featured]
     );
     res.status(201).json({ product: result.rows[0] });
   } catch (err) {
@@ -76,7 +79,7 @@ async function createProduct(req, res) {
 // PUT /api/admin/products/:id  (admin only)
 async function updateProduct(req, res) {
   try {
-    const { name, description, price, stock, image_url, category_id, is_active } = req.body;
+    const { name, description, price, stock, image_url, category_id, is_active, compare_at_price, featured } = req.body;
     const result = await db.query(
       `UPDATE products SET
         name = COALESCE($1, name),
@@ -86,9 +89,11 @@ async function updateProduct(req, res) {
         image_url = COALESCE($5, image_url),
         category_id = COALESCE($6, category_id),
         is_active = COALESCE($7, is_active),
+        compare_at_price = $8,
+        featured = COALESCE($9, featured),
         updated_at = now()
-       WHERE id = $8 RETURNING *`,
-      [name, description, price, stock, image_url, category_id, is_active, req.params.id]
+       WHERE id = $10 RETURNING *`,
+      [name, description, price, stock, image_url, category_id, is_active, compare_at_price || null, featured, req.params.id]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'Product not found.' });
     res.json({ product: result.rows[0] });

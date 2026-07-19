@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../lib/api';
 
-const emptyForm = { name: '', description: '', price: '', stock: '', image_url: '', category_id: '' };
+const emptyForm = { name: '', description: '', price: '', stock: '', image_url: '', category_id: '', compare_at_price: '', featured: false };
 
 function formatNaira(n) {
   return `₦${Number(n).toLocaleString('en-NG')}`;
@@ -54,6 +54,8 @@ export default function AdminProducts() {
       stock: p.stock,
       image_url: p.image_url || '',
       category_id: p.category_id || '',
+      compare_at_price: p.compare_at_price || '',
+      featured: !!p.featured,
     });
   }
 
@@ -70,6 +72,7 @@ export default function AdminProducts() {
       price: Number(form.price),
       stock: Number(form.stock),
       category_id: form.category_id || null,
+      compare_at_price: form.compare_at_price ? Number(form.compare_at_price) : null,
     };
     try {
       if (editingId) {
@@ -166,6 +169,22 @@ export default function AdminProducts() {
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
+        <input
+          type="number"
+          placeholder="Original price ₦ (optional — shows as a discount)"
+          value={form.compare_at_price}
+          onChange={(e) => update('compare_at_price', e.target.value)}
+          className="bg-bg border border-line rounded-md px-4 py-2.5 focus:outline-none focus:border-cyan"
+        />
+        <label className="flex items-center gap-2 text-sm text-gray-400 md:col-span-2">
+          <input
+            type="checkbox"
+            checked={form.featured}
+            onChange={(e) => update('featured', e.target.checked)}
+            className="accent-cyan"
+          />
+          Show in "Featured deals" on the homepage
+        </label>
         <textarea
           placeholder="Description"
           value={form.description}

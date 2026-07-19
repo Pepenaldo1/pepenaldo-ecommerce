@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../lib/api';
 
-const emptyForm = { name: '', description: '', price: '', stock: '', image_url: '', category_id: '' };
+const emptyForm = { name: '', description: '', price: '', stock: '', image_url: '', category_id: '', compare_at_price: '' };
 
 function formatNaira(n) {
   return `₦${Number(n).toLocaleString('en-NG')}`;
@@ -52,6 +52,7 @@ export default function VendorDashboard() {
       stock: p.stock,
       image_url: p.image_url || '',
       category_id: p.category_id || '',
+      compare_at_price: p.compare_at_price || '',
     });
   }
 
@@ -68,6 +69,7 @@ export default function VendorDashboard() {
       price: Number(form.price),
       stock: Number(form.stock),
       category_id: form.category_id || null,
+      compare_at_price: form.compare_at_price ? Number(form.compare_at_price) : null,
     };
     try {
       if (editingId) {
@@ -138,6 +140,13 @@ export default function VendorDashboard() {
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
+        <input
+          type="number"
+          placeholder="Original price ₦ (optional — shows as a discount)"
+          value={form.compare_at_price}
+          onChange={(e) => update('compare_at_price', e.target.value)}
+          className="bg-bg border border-line rounded-md px-4 py-2.5 focus:outline-none focus:border-cyan"
+        />
         <textarea
           placeholder="Description"
           value={form.description}

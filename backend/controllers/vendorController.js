@@ -57,15 +57,15 @@ async function listMyProducts(req, res) {
 // POST /api/vendor/products  (creates a product owned by this vendor)
 async function createMyProduct(req, res) {
   try {
-    const { name, description, price, stock, image_url, category_id } = req.body;
+    const { name, description, price, stock, image_url, category_id, compare_at_price } = req.body;
     if (!name || price === undefined) {
       return res.status(400).json({ error: 'Name and price are required.' });
     }
     const result = await db.query(
-      `INSERT INTO products (name, description, price, stock, image_url, category_id, vendor_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO products (name, description, price, stock, image_url, category_id, vendor_id, compare_at_price)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
-      [name, description || null, price, stock || 0, image_url || null, category_id || null, req.user.id]
+      [name, description || null, price, stock || 0, image_url || null, category_id || null, req.user.id, compare_at_price || null]
     );
     res.status(201).json({ product: result.rows[0] });
   } catch (err) {
@@ -83,7 +83,7 @@ async function updateMyProduct(req, res) {
       return res.status(403).json({ error: 'You do not own this product.' });
     }
 
-    const { name, description, price, stock, image_url, category_id, is_active } = req.body;
+    const { name, description, price, stock, image_url, category_id, is_active, compare_at_price } = req.body;
     const result = await db.query(
       `UPDATE products SET
         name = COALESCE($1, name),
@@ -93,10 +93,11 @@ async function updateMyProduct(req, res) {
         image_url = COALESCE($5, image_url),
         category_id = COALESCE($6, category_id),
         is_active = COALESCE($7, is_active),
+        compare_at_price = $8,
         updated_at = now()
-       WHERE id = $8
+       WHERE id = $9
        RETURNING *`,
-      [name, description, price, stock, image_url, category_id, is_active, req.params.id]
+      [name, description, price, stock, image_url, category_id, is_active, compare_at_price || null, req.params.id]
     );
     res.json({ product: result.rows[0] });
   } catch (err) {
