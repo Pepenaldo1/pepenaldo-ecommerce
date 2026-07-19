@@ -9,7 +9,7 @@ export default function BottomNav() {
 
   const items = [
     { href: '/', label: 'Home', Icon: Home },
-    { href: '/?showCategories=1', label: 'Categories', Icon: LayoutGrid },
+    { href: '/#categories', label: 'Categories', Icon: LayoutGrid },
     { href: '/deals', label: 'Deals', Icon: Tag },
     { href: user ? '/orders' : '/login', label: 'Orders', Icon: Package },
     { href: user ? '/account' : '/login', label: 'Profile', Icon: User },

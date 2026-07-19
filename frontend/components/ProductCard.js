@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useState } from 'react';
-import { Heart, ShoppingCart } from 'lucide-react';
+import { Heart, ShoppingCart, Star } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
@@ -91,6 +91,15 @@ export default function ProductCard({ product }) {
           {product.category_name || 'General'}
         </p>
         <h3 className="font-semibold text-base leading-snug">{product.name}</h3>
+        {product.review_count > 0 ? (
+          <div className="flex items-center gap-1 mt-1">
+            <Star size={12} fill="#FBBF24" color="#FBBF24" />
+            <span className="text-xs font-mono text-gray-300">{Number(product.avg_rating).toFixed(1)}</span>
+            <span className="text-xs font-mono text-gray-600">({product.review_count})</span>
+          </div>
+        ) : (
+          <p className="text-xs font-mono text-gray-600 mt-1">No reviews yet</p>
+        )}
         <p className="font-mono text-[10px] text-gray-600 tracking-wide mt-1">
           Sold by {product.vendor_name || 'Pepenaldo'}
           {product.vendor_verified && <span className="text-cyan"> ✓</span>}

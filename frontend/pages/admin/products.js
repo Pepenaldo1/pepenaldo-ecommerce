@@ -20,6 +20,8 @@ export default function AdminProducts() {
   const [error, setError] = useState('');
   const [newCategoryName, setNewCategoryName] = useState('');
   const [categoryError, setCategoryError] = useState('');
+  const [heroImageUrl, setHeroImageUrl] = useState('');
+  const [settingsSaved, setSettingsSaved] = useState(false);
 
   async function loadProducts() {
     const data = await api.get('/products');
@@ -31,15 +33,27 @@ export default function AdminProducts() {
     setCategories(data.categories);
   }
 
+  async function loadSettings() {
+    const data = await api.get('/settings');
+    setHeroImageUrl(data.settings.hero_image_url || '');
+  }
+
   useEffect(() => {
     if (authLoading) return;
     if (!user || user.role !== 'admin') {
       router.push('/login');
       return;
     }
-    Promise.all([loadProducts(), loadCategories()]).finally(() => setLoading(false));
+    Promise.all([loadProducts(), loadCategories(), loadSettings()]).finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, router]);
+
+  async function handleSaveSettings(e) {
+    e.preventDefault();
+    await api.put('/admin/settings', { hero_image_url: heroImageUrl }, token);
+    setSettingsSaved(true);
+    setTimeout(() => setSettingsSaved(false), 2000);
+  }
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -110,6 +124,21 @@ export default function AdminProducts() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-16">
       <h1 className="font-display font-bold text-3xl mb-8">Manage products</h1>
+
+      <form onSubmit={handleSaveSettings} className="bg-surface border border-line rounded-xl p-6 mb-6 flex gap-3 items-start flex-wrap">
+        <input
+          placeholder="Homepage hero image URL"
+          value={heroImageUrl}
+          onChange={(e) => setHeroImageUrl(e.target.value)}
+          className="bg-bg border border-line rounded-md px-4 py-2.5 flex-1 min-w-[200px] focus:outline-none focus:border-cyan"
+        />
+        <button type="submit" className="border border-cyan text-cyan font-display font-semibold uppercase tracking-wide px-5 py-2.5 rounded-md">
+          {settingsSaved ? 'Saved ✓' : 'Save hero image'}
+        </button>
+        <p className="text-gray-500 text-xs font-mono w-full">
+          This image appears on the homepage hero banner. Leave blank to show the placeholder.
+        </p>
+      </form>
 
       <form onSubmit={handleAddCategory} className="bg-surface border border-line rounded-xl p-6 mb-6 flex gap-3 items-start flex-wrap">
         <input

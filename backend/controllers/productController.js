@@ -22,11 +22,15 @@ async function listProducts(req, res) {
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const result = await db.query(
       `SELECT p.*, c.name AS category_name, c.slug AS category_slug,
-              v.business_name AS vendor_name, v.vendor_verified
+              v.business_name AS vendor_name, v.vendor_verified,
+              COALESCE(AVG(r.rating), 0)::float AS avg_rating,
+              COUNT(r.id)::int AS review_count
        FROM products p
        LEFT JOIN categories c ON c.id = p.category_id
        LEFT JOIN users v ON v.id = p.vendor_id
+       LEFT JOIN reviews r ON r.product_id = p.id
        ${where}
+       GROUP BY p.id, c.name, c.slug, v.business_name, v.vendor_verified
        ORDER BY p.created_at DESC`,
       params
     );
@@ -42,11 +46,15 @@ async function getProduct(req, res) {
   try {
     const result = await db.query(
       `SELECT p.*, c.name AS category_name, c.slug AS category_slug,
-              v.business_name AS vendor_name, v.vendor_verified, v.id AS vendor_id_ref
+              v.business_name AS vendor_name, v.vendor_verified, v.id AS vendor_id_ref,
+              COALESCE(AVG(r.rating), 0)::float AS avg_rating,
+              COUNT(r.id)::int AS review_count
        FROM products p
        LEFT JOIN categories c ON c.id = p.category_id
        LEFT JOIN users v ON v.id = p.vendor_id
-       WHERE p.id = $1`,
+       LEFT JOIN reviews r ON r.product_id = p.id
+       WHERE p.id = $1
+       GROUP BY p.id, c.name, c.slug, v.business_name, v.vendor_verified, v.id`,
       [req.params.id]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'Product not found.' });
@@ -158,4 +166,31 @@ async function createCategory(req, res) {
   }
 }
 
-module.exports = { listProducts, getProduct, createProduct, updateProduct, deleteProduct, listCategories, createCategory };
+// GET /api/products/meta/best-sellers  (real sales data, never fabricated)
+async function listBestSellers(req, res) {
+  try {
+    const result = await db.query(
+      `SELECT p.*, c.name AS category_name, c.slug AS category_slug,
+              v.business_name AS vendor_name, v.vendor_verified,
+              COALESCE(AVG(r.rating), 0)::float AS avg_rating,
+              COUNT(DISTINCT r.id)::int AS review_count,
+              SUM(oi.quantity)::int AS units_sold
+       FROM products p
+       JOIN order_items oi ON oi.product_id = p.id
+       JOIN orders o ON o.id = oi.order_id AND o.payment_status = 'paid'
+       LEFT JOIN categories c ON c.id = p.category_id
+       LEFT JOIN users v ON v.id = p.vendor_id
+       LEFT JOIN reviews r ON r.product_id = p.id
+       WHERE p.is_active = true
+       GROUP BY p.id, c.name, c.slug, v.business_name, v.vendor_verified
+       ORDER BY units_sold DESC
+       LIMIT 12`
+    );
+    res.json({ products: result.rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Could not load best sellers.' });
+  }
+}
+
+module.exports = { listProducts, getProduct, createProduct, updateProduct, deleteProduct, listCategories, createCategory, listBestSellers };

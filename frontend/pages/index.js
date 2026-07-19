@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { ShieldCheck, BadgeCheck, LayoutGrid, Clock, Search } from 'lucide-react';
+import { ShieldCheck, BadgeCheck, LayoutGrid, Clock, Search, ImagePlus, Shirt, Pizza, Cpu } from 'lucide-react';
 import { api } from '../lib/api';
 import ProductCard from '../components/ProductCard';
 import { iconForCategory } from '../lib/categoryIcons';
@@ -13,18 +13,26 @@ const trustBadges = [
   { Icon: Clock, title: 'Always open', sub: 'Shop anytime' },
 ];
 
+const promoBanners = [
+  { category: 'fashion', label: 'New Arrivals', title: 'Fresh Picks Just for You', cta: 'Shop Now', Icon: Shirt, from: '#4C1D95', to: '#7C3AED' },
+  { category: 'food', label: 'Food Deals', title: 'Up to 30% Off', cta: 'Order Now', Icon: Pizza, from: '#92400E', to: '#D97706' },
+  { category: 'tech', label: 'Tech Essentials', title: 'Upgrade Your Lifestyle', cta: 'Shop Now', Icon: Cpu, from: '#1E3A8A', to: '#2563EB' },
+];
+
 export default function Home() {
   const router = useRouter();
   const { category } = router.query;
   const [products, setProducts] = useState([]);
   const [featured, setFeatured] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [heroImage, setHeroImage] = useState(null);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     api.get('/products/meta/categories').then((data) => setCategories(data.categories));
     api.get('/products?featured=true').then((data) => setFeatured(data.products.slice(0, 8)));
+    api.get('/settings').then((data) => setHeroImage(data.settings.hero_image_url));
   }, []);
 
   useEffect(() => {
@@ -47,29 +55,45 @@ export default function Home() {
     <div className="max-w-6xl mx-auto px-6 py-8">
       {/* Hero */}
       <section
-        className="mb-8 rounded-2xl p-8 md:p-12"
+        className="mb-8 rounded-2xl p-8 md:p-12 grid md:grid-cols-2 gap-8 items-center"
         style={{ background: 'linear-gradient(135deg, #2E1065 0%, #4C1D95 45%, #6D28D9 100%)' }}
       >
-        <p className="font-mono text-purple-200 text-sm mb-3">// ALL SYSTEMS OPERATIONAL</p>
-        <h1 className="font-display font-bold text-4xl md:text-6xl leading-none max-w-2xl text-white">
-          Tech, food & fashion — <span className="text-purple-300">one cart.</span>
-        </h1>
-        <p className="text-purple-100/80 mt-4 max-w-lg">
-          Explore products from verified sellers across {categories.length || '15+'} categories. Smart search, fast checkout.
-        </p>
-        <div className="flex flex-wrap gap-3 mt-6">
-          <a
-            href="#catalog"
-            className="bg-white text-[#2E1065] font-display font-semibold uppercase tracking-wide px-6 py-2.5 rounded-md"
-          >
-            Shop now
-          </a>
-          <a
-            href="#categories"
-            className="border border-white/40 text-white font-display font-semibold uppercase tracking-wide px-6 py-2.5 rounded-md"
-          >
-            Explore categories
-          </a>
+        <div>
+          <p className="font-mono text-purple-200 text-sm mb-3">// ALL SYSTEMS OPERATIONAL</p>
+          <h1 className="font-display font-bold text-4xl md:text-6xl leading-none text-white">
+            Tech, food & fashion — <span className="text-purple-300">one cart.</span>
+          </h1>
+          <p className="text-purple-100/80 mt-4 max-w-lg">
+            Explore products from verified sellers across {categories.length || '15+'} categories. Smart search, fast checkout.
+          </p>
+          <div className="flex flex-wrap gap-3 mt-6">
+            <a
+              href="#catalog"
+              className="bg-white text-[#2E1065] font-display font-semibold uppercase tracking-wide px-6 py-2.5 rounded-md"
+            >
+              Shop now
+            </a>
+            <a
+              href="#categories"
+              className="border border-white/40 text-white font-display font-semibold uppercase tracking-wide px-6 py-2.5 rounded-md"
+            >
+              Explore categories
+            </a>
+          </div>
+        </div>
+
+        <div className="aspect-square md:aspect-[4/3] rounded-xl overflow-hidden flex items-center justify-center">
+          {heroImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={heroImage} alt="Featured" className="w-full h-full object-cover rounded-xl" />
+          ) : (
+            <div className="w-full h-full border-2 border-dashed border-white/30 rounded-xl flex flex-col items-center justify-center gap-2 text-white/60">
+              <ImagePlus size={32} />
+              <p className="text-sm font-mono text-center px-6">
+                Add a hero photo from Admin → Settings
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -149,6 +173,27 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* Promo banners — real category links, icon art instead of stock photos */}
+      <section className="grid md:grid-cols-3 gap-4 mb-10">
+        {promoBanners.map(({ category: cat, label, title, cta, Icon, from, to }) => (
+          <Link
+            key={cat}
+            href={`/?category=${cat}#catalog`}
+            className="relative rounded-xl p-6 overflow-hidden flex flex-col justify-between min-h-[140px]"
+            style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}
+          >
+            <Icon size={90} className="absolute -right-4 -bottom-4 text-white/15" />
+            <div>
+              <p className="text-white/70 text-xs font-mono uppercase tracking-wide">{label}</p>
+              <p className="text-white font-display font-bold text-lg mt-1">{title}</p>
+            </div>
+            <span className="bg-white text-sm font-display font-semibold uppercase tracking-wide px-4 py-2 rounded-md w-fit mt-4" style={{ color: from }}>
+              {cta}
+            </span>
+          </Link>
+        ))}
+      </section>
 
       {/* Full catalog */}
       <section id="catalog" className="scroll-mt-20">

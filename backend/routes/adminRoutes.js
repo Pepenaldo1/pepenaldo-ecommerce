@@ -8,6 +8,7 @@ const {
   createCategory,
 } = require('../controllers/productController');
 const { listAllOrders, updateOrderStatus } = require('../controllers/orderController');
+const { updateSettings } = require('../controllers/settingsController');
 
 router.use(requireAuth, requireAdmin);
 
@@ -18,6 +19,9 @@ router.delete('/products/:id', deleteProduct);
 
 // Category management
 router.post('/categories', createCategory);
+
+// Site settings (hero image, etc.)
+router.put('/settings', updateSettings);
 
 // Order management
 router.get('/orders', listAllOrders);
