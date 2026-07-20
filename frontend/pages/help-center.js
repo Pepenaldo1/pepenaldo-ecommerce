@@ -1,3 +1,5 @@
+import Seo from '../components/Seo';
+
 const faqs = [
   {
     q: 'How do I track my order?',
@@ -20,6 +22,7 @@ const faqs = [
 export default function HelpCenter() {
   return (
     <div className="max-w-3xl mx-auto px-6 py-16">
+      <Seo title="Help Center" description="Answers to common questions about shopping and selling on Pepenaldo." path="/help-center" />
       <h1 className="font-display font-bold text-3xl mb-2">Help Center</h1>
       <p className="text-gray-500 mb-10 font-mono text-sm">Answers to common questions.</p>
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
 import ProductCard from '../components/ProductCard';
+import Seo from '../components/Seo';
 
 export default function BestSellers() {
   const [products, setProducts] = useState([]);
@@ -12,6 +13,7 @@ export default function BestSellers() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
+      <Seo title="Best Sellers" description="Pepenaldo's top-selling products, ranked by real units sold." path="/best-sellers" />
       <h1 className="font-display font-bold text-3xl mb-2">Best Sellers</h1>
       <p className="text-gray-500 mb-8 font-mono text-sm">
         Ranked by real units sold from completed, paid orders.

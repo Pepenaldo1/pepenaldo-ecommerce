@@ -5,6 +5,7 @@ import { api } from '../../lib/api';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import Seo from '../../components/Seo';
 
 export default function ProductDetail() {
   const router = useRouter();
@@ -67,6 +68,12 @@ export default function ProductDetail() {
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
+      <Seo
+        title={product.name}
+        description={product.description ? product.description.slice(0, 155) : `Buy ${product.name} on Pepenaldo — sold by ${product.vendor_name || 'Pepenaldo'}.`}
+        path={`/product/${product.id}`}
+        image={product.image_url}
+      />
       <div className="grid md:grid-cols-2 gap-10">
         <div className="aspect-square bg-surface border border-line rounded-xl flex items-center justify-center overflow-hidden">
           {product.image_url ? (

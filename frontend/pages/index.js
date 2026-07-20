@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ShieldCheck, BadgeCheck, LayoutGrid, Clock, Search, ImagePlus, Shirt, Pizza, Cpu } from 'lucide-react';
 import { api } from '../lib/api';
 import ProductCard from '../components/ProductCard';
+import Seo from '../components/Seo';
 import { iconForCategory } from '../lib/categoryIcons';
 
 const trustBadges = [
@@ -53,6 +54,10 @@ export default function Home() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">
+      <Seo
+        description="Browse tech, food, fashion and more from verified sellers on Pepenaldo. Real reviews, secure checkout, fast search."
+        image={heroImage}
+      />
       {/* Hero */}
       <section
         className="mb-8 rounded-2xl p-8 md:p-12 grid md:grid-cols-2 gap-8 items-center"

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
 import ProductCard from '../components/ProductCard';
+import Seo from '../components/Seo';
 
 export default function Deals() {
   const [products, setProducts] = useState([]);
@@ -15,6 +16,7 @@ export default function Deals() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
+      <Seo title="Deals" description="Real discounts set by sellers on Pepenaldo — no inflated prices." path="/deals" />
       <h1 className="font-display font-bold text-3xl mb-2">Deals</h1>
       <p className="text-gray-500 mb-8 font-mono text-sm">
         Real discounts set by sellers — no inflated numbers.

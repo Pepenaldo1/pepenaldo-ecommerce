@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
 import ProductCard from '../components/ProductCard';
+import Seo from '../components/Seo';
 
 export default function NewArrivals() {
   const [products, setProducts] = useState([]);
@@ -12,6 +13,7 @@ export default function NewArrivals() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
+      <Seo title="New Arrivals" description="The newest products listed on Pepenaldo, freshest first." path="/new-arrivals" />
       <h1 className="font-display font-bold text-3xl mb-2">New Arrivals</h1>
       <p className="text-gray-500 mb-8 font-mono text-sm">The most recently listed products, newest first.</p>
 
